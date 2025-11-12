@@ -1,0 +1,360 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "不動産賃貸借契約書データスキーマ",
+  "description": "不動産賃貸借契約書から抽出されるデータの構造を定義するJSONスキーマ",
+  "type": "object",
+  "required": ["metadata", "content"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "契約書のメタデータ",
+      "required": ["title", "number_page", "language"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "契約書のタイトル"
+        },
+        "number_page": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "ページ数"
+        },
+        "language": {
+          "type": "string",
+          "enum": ["ja", "en"],
+          "description": "言語（ja: 日本語, en: 英語）"
+        }
+      }
+    },
+    "content": {
+      "type": "object",
+      "description": "契約書の内容",
+      "required": ["fundamental", "building", "terms", "financials", "stake_holders"],
+      "properties": {
+        "fundamental": {
+          "type": "object",
+          "description": "基本データ",
+          "required": ["contract_type", "contract_date"],
+          "properties": {
+            "contract_type": {
+              "type": "string",
+              "description": "契約形態（例: 普通賃貸借契約、定期借家契約）"
+            },
+            "contract_date": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "契約締結日（YYYY-MM-DD形式）"
+            }
+          }
+        },
+        "building": {
+          "type": "object",
+          "description": "目的建物",
+          "required": ["name", "address", "usage_type"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "建物名称"
+            },
+            "room_number": {
+              "type": "string",
+              "description": "部屋番号"
+            },
+            "address": {
+              "type": "object",
+              "required": ["pref", "city", "dist"],
+              "properties": {
+                "pref": {
+                  "type": "string",
+                  "description": "都道府県"
+                },
+                "city": {
+                  "type": "string",
+                  "description": "市区町村"
+                },
+                "dist": {
+                  "type": "string",
+                  "description": "番地"
+                }
+              }
+            },
+            "usage_type": {
+              "type": "string",
+              "description": "用途（例: 居住用、事務用）"
+            },
+            "area": {
+              "type": "object",
+              "required": ["value", "unit"],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "面積の値"
+                },
+                "unit": {
+                  "type": "string",
+                  "enum": ["平米", "坪"],
+                  "description": "面積の単位"
+                }
+              }
+            },
+            "structure": {
+              "type": "object",
+              "properties": {
+                "main_structure": {
+                  "type": "string",
+                  "description": "主要構造（例: 木造、鉄筋コンクリート造）"
+                },
+                "roof_structure": {
+                  "type": "string",
+                  "description": "屋根構造（例: 陸屋根、瓦葺）"
+                }
+              }
+            }
+          }
+        },
+        "terms": {
+          "type": "object",
+          "description": "契約期間",
+          "required": ["start_date", "end_date"],
+          "properties": {
+            "start_date": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "契約開始日（YYYY-MM-DD形式）"
+            },
+            "end_date": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "契約満了日（YYYY-MM-DD形式）"
+            },
+            "term_year": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "契約年数"
+            }
+          }
+        },
+        "financials": {
+          "type": "object",
+          "description": "賃料などに関するデータ",
+          "required": ["fees"],
+          "properties": {
+            "fees": {
+              "type": "array",
+              "description": "費用のリスト",
+              "items": {
+                "type": "object",
+                "required": ["type", "value", "unit"],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "RENT",
+                      "DEPOSIT",
+                      "DEPOSIT_AMORTIZATION",
+                      "KEY_MONEY",
+                      "COMMON_FEE",
+                      "INSURANCE",
+                      "GUARANTOR_FEE",
+                      "RENEWAL_FEE",
+                      "RENEWAL_HANDLE_FEE"
+                    ],
+                    "description": "費用の種別"
+                  },
+                  "value": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "金額"
+                  },
+                  "unit": {
+                    "type": "string",
+                    "description": "単位（例: 円/月、円）"
+                  },
+                  "tax_included": {
+                    "type": "boolean",
+                    "description": "税込か否か"
+                  },
+                  "tax_rate": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "税率（例: 0.1 = 10%）"
+                  },
+                  "timing": {
+                    "type": "object",
+                    "properties": {
+                      "span": {
+                        "type": "string",
+                        "enum": ["毎年", "毎月", "契約時"],
+                        "description": "支払い周期"
+                      },
+                      "due_day": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99,
+                        "description": "支払い日（1-31: 日付、0: 契約時、99: 末日）"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "auto_renewal": {
+              "type": "boolean",
+              "description": "自動更新の有無"
+            },
+            "notice_lessee_to_lessor_deadline": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "借主から貸主への解約意思表示期限（YYYY-MM-DD形式）"
+            },
+            "notice_lessor_to_lessee_deadline": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "貸主から借主への解約意思表示期限（YYYY-MM-DD形式）"
+            },
+            "other_conditions": {
+              "type": "string",
+              "description": "その他の条件"
+            }
+          }
+        },
+        "additional_facilities": {
+          "type": "array",
+          "description": "附属施設についてのデータ",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "施設名称"
+              },
+              "area": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "面積の値"
+                  },
+                  "unit": {
+                    "type": "string",
+                    "enum": ["平米", "坪"],
+                    "description": "面積の単位"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "stake_holders": {
+          "type": "array",
+          "description": "利害関係者についてのデータ",
+          "items": {
+            "type": "object",
+            "required": ["role_type", "name"],
+            "properties": {
+              "role_type": {
+                "type": "string",
+                "enum": [
+                  "LESSOR",
+                  "LESSEE",
+                  "MANAGER",
+                  "OWNER",
+                  "CO-GUARANTOR",
+                  "EMERGENCY-CONTACT",
+                  "MEDIATOR"
+                ],
+                "description": "役割の種別"
+              },
+              "name": {
+                "type": "string",
+                "description": "名前"
+              },
+              "address": {
+                "type": "object",
+                "properties": {
+                  "pref": {
+                    "type": "string",
+                    "description": "都道府県"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "市区町村"
+                  },
+                  "dist": {
+                    "type": "string",
+                    "description": "番地"
+                  },
+                  "building": {
+                    "type": "string",
+                    "description": "建物"
+                  }
+                }
+              },
+              "mails": {
+                "type": "array",
+                "description": "メールアドレスのリスト",
+                "items": {
+                  "type": "object",
+                  "required": ["mail", "type"],
+                  "properties": {
+                    "mail": {
+                      "type": "string",
+                      "format": "email",
+                      "description": "メールアドレス"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["MAIN", "HOME", "PHONE", "OCCUPATION"],
+                      "description": "メールの種別"
+                    }
+                  }
+                }
+              },
+              "phone_numbers": {
+                "type": "array",
+                "description": "電話番号のリスト",
+                "items": {
+                  "type": "object",
+                  "required": ["number", "type"],
+                  "properties": {
+                    "number": {
+                      "type": "string",
+                      "description": "電話番号"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["MAIN", "HOME", "PHONE", "OCCUPATION"],
+                      "description": "電話番号の種別"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "special_terms": {
+          "type": "array",
+          "description": "特約事項",
+          "items": {
+            "type": "object",
+            "required": ["term_name", "term_details"],
+            "properties": {
+              "term_name": {
+                "type": "string",
+                "description": "特約名"
+              },
+              "term_details": {
+                "type": "string",
+                "description": "特約の具体的な内容や適用事項"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

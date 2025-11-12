@@ -1,0 +1,58 @@
+{
+  "gemini-2.5-pro": {
+    "input_token_price_per_1m": 1.25,
+    "output_token_price_per_1m": 5.00,
+    "currency": "USD",
+    "exchange_rate": 150.0,
+    "note": "Google Gemini 2.5 Pro"
+  },
+  "gemini-2.5-flash": {
+    "input_token_price_per_1m": 0.075,
+    "output_token_price_per_1m": 0.30,
+    "currency": "USD",
+    "exchange_rate": 150.0,
+    "note": "Google Gemini 2.5 Flash"
+  },
+  "gpt-4o": {
+    "input_token_price_per_1m": 2.50,
+    "output_token_price_per_1m": 10.00,
+    "currency": "USD",
+    "exchange_rate": 150.0,
+    "note": "OpenAI GPT-4o"
+  },
+  "gpt-4o-mini": {
+    "input_token_price_per_1m": 0.15,
+    "output_token_price_per_1m": 0.60,
+    "currency": "USD",
+    "exchange_rate": 150.0,
+    "note": "OpenAI GPT-4o mini"
+  },
+  "claude-3-opus": {
+    "input_token_price_per_1m": 15.00,
+    "output_token_price_per_1m": 75.00,
+    "currency": "USD",
+    "exchange_rate": 150.0,
+    "note": "Anthropic Claude 3 Opus"
+  },
+  "claude-3-sonnet": {
+    "input_token_price_per_1m": 3.00,
+    "output_token_price_per_1m": 15.00,
+    "currency": "USD",
+    "exchange_rate": 150.0,
+    "note": "Anthropic Claude 3 Sonnet"
+  },
+  "claude-3.5-sonnet": {
+    "input_token_price_per_1m": 3.00,
+    "output_token_price_per_1m": 15.00,
+    "currency": "USD",
+    "exchange_rate": 150.0,
+    "note": "Anthropic Claude 3.5 Sonnet"
+  },
+  "azure-document-intelligence": {
+    "input_token_price_per_1m": 0.00,
+    "output_token_price_per_1m": 0.00,
+    "currency": "USD",
+    "exchange_rate": 150.0,
+    "note": "Azure Document Intelligence - ページ単位課金（別途設定が必要）"
+  }
+}

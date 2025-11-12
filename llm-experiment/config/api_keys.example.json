@@ -1,0 +1,9 @@
+{
+  "gemini": "YOUR_GEMINI_API_KEY_HERE",
+  "openai": "YOUR_OPENAI_API_KEY_HERE",
+  "anthropic": "YOUR_ANTHROPIC_API_KEY_HERE",
+  "azure": {
+    "endpoint": "https://YOUR_RESOURCE_NAME.cognitiveservices.azure.com/",
+    "key": "YOUR_AZURE_KEY_HERE"
+  }
+}
