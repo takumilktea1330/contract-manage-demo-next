@@ -1,0 +1,154 @@
+以下は「WEBアプリ開発」でチームが迷いがちなところに絞った、GitHub（=Git + GitHub運用）の実務まとめです。Next.js / React / API（FastAPI/Lambda等）でもそのまま使えます。
+
+⸻
+
+1) Git と GitHub の役割（最短理解）
+	•	Git：変更履歴をローカルで管理する仕組み（commit / branch / merge）
+	•	GitHub：Gitの履歴を共有し、レビュー・CI・Issue管理をする場所（PR / Actions / Projects）
+
+⸻
+
+2) 最低限の運用ルール（これだけで破綻しない）
+
+ブランチ戦略（シンプル版）
+	•	main：常にデプロイ可能（保護ブランチ推奨）
+	•	develop：開発統合（※小規模なら省略して main 直PRでもOK）
+	•	作業ブランチ：
+	•	feat/xxx（機能）
+	•	fix/xxx（バグ）
+	•	chore/xxx（雑務・依存更新）
+
+ルール
+	•	直接 main に push しない
+	•	変更は必ず Pull Request（PR） 経由
+	•	PRは 小さく（理想：数百行以内、巨大なら分割）
+
+⸻
+
+3) 日々の基本フロー（開発者が毎回やるやつ）
+
+新規作業開始
+
+git checkout main
+git pull origin main
+git checkout -b feat/login-api
+
+変更してコミット
+
+git add .
+git commit -m "feat: add login endpoint"
+
+push → PR作成
+
+git push -u origin feat/login-api
+
+GitHub上でPRを作り、レビュー依頼 → CIが通ったら merge。
+
+⸻
+
+4) PR（Pull Request）運用のコツ
+
+PRに必ず書く項目テンプレ
+	•	何をしたか（要約）
+	•	どう確認したか（手順 / スクショ / curl）
+	•	影響範囲（DB変更、破壊的変更、env追加など）
+	•	関連Issue（Closes #123）
+
+レビュー観点（レビュワー用）
+	•	仕様どおりか
+	•	セキュリティ（認可/認証、秘密情報、入力バリデーション）
+	•	例外・エラーハンドリング
+	•	テストがあるか、落ちないか
+	•	ログ/監視に必要な情報が出るか
+
+⸻
+
+5) コンフリクトの基本対処（よくある事故）
+
+main の最新を取り込んで解決
+
+git checkout feat/login-api
+git fetch origin
+git rebase origin/main
+# コンフリクト解決
+git add .
+git rebase --continue
+git push -f   # rebaseしたら基本これ（チームルールに従う）
+
+※チームで merge 運用に統一するなら git merge origin/main でもOK。どちらかに揃えるのが大事。
+
+⸻
+
+6) GitHub で使うべき機能セット（WEBアプリ開発向け）
+
+Issues（タスク管理）
+	•	バグ/機能/調査をIssue化
+	•	PRと紐付け（Closes #xx でマージ時に自動Close）
+
+Actions（CI）
+
+最低限：
+	•	lint（ESLint等）
+	•	test（unit / integration）
+	•	build（Next build / docker build）
+	•	型チェック（TypeScript）
+
+Branch protection（事故防止）
+
+main に設定推奨：
+	•	PR必須
+	•	CI必須（Actions成功必須）
+	•	直push禁止
+	•	review 1名以上必須（可能なら）
+
+CODEOWNERS（レビュー自動アサイン）
+
+例：フロントはA、APIはBが自動でレビュワーになるように。
+
+⸻
+
+7) リポジトリ構成（よくある2パターン）
+
+A. モノレポ（おすすめになりがち）
+
+/apps/web, /apps/api, /packages/shared など
+	•	変更が追いやすい、PRが1本で済む
+	•	CI設計は少し工夫が必要
+
+B. フロント/バック分離
+	•	権限分離やデプロイ分離が楽
+	•	変更がまたぐとPRが複数必要
+
+⸻
+
+8) 絶対やってはいけない（セキュリティ事故）
+	•	.env、APIキー、秘密鍵、JWT秘密鍵などを コミットしない
+	•	dotenv は .env.example を置いて共有
+	•	誤って上げたら 削除コミットだけではダメ（履歴に残る）
+→ 速やかにキー無効化＆履歴除去（BFG等）対応
+
+⸻
+
+9) 便利な小技（効くやつだけ）
+	•	git stash：作業中の変更を一時退避
+	•	git commit --amend：直前コミット修正（push後は注意）
+	•	Draft PR：未完成でも早めに共有したい時
+	•	Squash merge：履歴を綺麗にしたい時（運用に合わせる）
+
+⸻
+
+10) “チームに配る”最小ルール（コピペ用）
+	•	main直push禁止、PR必須
+	•	PRは小さく、説明と確認手順を書く
+	•	CI（lint/test/build）必須
+	•	.env をコミットしない
+	•	ブランチ命名：feat/ fix/ chore/
+	•	マージ方式：Squash merge（など）に統一
+
+⸻
+
+必要なら、あなたのプロジェクト前提（例：Next.js + FastAPI + AWS / DBあり）で
+	•	.github/workflows/ci.yml の雛形
+	•	PRテンプレ、Issueテンプレ、CODEOWNERS
+	•	ブランチ保護の推奨設定
+までセットで作って渡せます。
